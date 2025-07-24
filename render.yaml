@@ -25,11 +25,9 @@ services:
     env: docker # Diz ao Render para usar a imagem Docker especificada.
     image:
       url: atendai/evolution-api:latest # A imagem da Evolution API.
-    dependsOn:
-      - db # Garante que o banco de dados inicie antes da API.
     envVars:
       - key: AUTHENTICATION_API_KEY
-        value: "suasenhasecreta123" # Troque se quiser, ou use um segredo.
+        value: "{=*?p-p$(f_~~EW&" # Troque se quiser, ou use um segredo.
       - key: TYPEORM_CONNECTION
         value: postgres
       # O Render injeta automaticamente as variáveis de conexão do banco de dados.
