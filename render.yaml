@@ -1,21 +1,14 @@
-# render.yaml - Versão 5 (Híbrida e Final)
-# Define apenas os serviços que podem ser gerenciados pelo arquivo.
-# O banco de dados é criado manualmente no painel do Render.
+# render.yaml - Versão 6 (Mínima e Direta)
 
 services:
-  # Serviço Único: A API da Evolution.
   - type: web
     name: evolution-api
     env: docker
     image:
       url: atendai/evolution-api:latest
     healthCheckPath: /
-
-    # Importa todas as variáveis do grupo de ambiente criado no painel do Render.
-    envVarGroups:
-      - name: evolution-api # <-- O nome exato do grupo que você criou.
-
-    # Disco para salvar a sessão do WhatsApp (QR Code, etc).
+    # As variáveis de ambiente (envVars) serão gerenciadas
+    # diretamente no painel do Render para evitar conflitos.
     disk:
       name: evolution-instances
       mountPath: /evolution/instances
