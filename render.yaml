@@ -16,9 +16,9 @@ services:
         value: "{=*?p-p$(f_~~EW&"
 
       # Conexão com o banco de dados criado manualmente.
-      # Cole a "Internal Database URL" do seu banco de dados do Render aqui.
+      # O valor desta variável é injetado a partir dos segredos do serviço no painel do Render.
       - key: DATABASE_URL
-        value: "postgresql://evolution_db_84gi_user:VNoNZJUHa02iP6rtqE03e0u11OGpxES2@dpg-d213d03ipnbc73dtk0ig-a/evolution_db_84gi"
+        fromEnv: true # Diz ao Render para usar a variável de ambiente com este nome.
 
       # Forçamos o uso de SSL, que é necessário para conexões externas no Render.
       - key: DATABASE_EXTRA_PARAMS
