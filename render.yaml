@@ -1,20 +1,13 @@
-# render.yaml - Versão 3 (Robusta e Simplificada)
-# Infraestrutura como código otimizada para o Render.
+# render.yaml - Versão 4 (Com Tipos Nativos do Render)
+# Infraestrutura como código usando os tipos de serviço específicos do Render.
 
 services:
-  # Serviço 1: Banco de Dados PostgreSQL.
-  # Esta é a fonte da verdade. O Render gerencia a criação e as credenciais.
-  - type: pserv
+  # Serviço 1: O Banco de Dados PostgreSQL, usando o tipo nativo do Render.
+  - type: postgres
     name: db
-    image:
-      url: postgres:15
-    disk:
-      name: pgdata
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
+    ipAllowList: [] # Permite acesso de qualquer lugar (necessário para a API se conectar)
 
-  # Serviço 2: API da Evolution.
-  # Configurada para consumir as credenciais do banco de dados de forma segura.
+  # Serviço 2: A API da Evolution.
   - type: web
     name: evolution-api
     env: docker
@@ -27,12 +20,10 @@ services:
         value: "{=*?p-p$(f_~~EW&"
 
       # A ÚNICA variável de banco de dados necessária.
-      # O Render injeta a URL de conexão completa e segura do nosso serviço 'db'.
-      # A Evolution API é inteligente o suficiente para analisar esta URL.
+      # Usamos a URL de conexão segura que o Render cria para seu banco de dados nativo.
       - key: DATABASE_URL
-        fromService:
-          type: pserv
-          name: db
+        fromDatabase:
+          name: db # O nome do nosso serviço de banco de dados acima.
           property: connectionString
 
       # Forçamos o uso de SSL, que é necessário para conexões externas no Render.
