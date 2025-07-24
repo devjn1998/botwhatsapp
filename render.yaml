@@ -1,0 +1,72 @@
+# render.yaml
+# Esta é a definição da infraestrutura como código para o projeto no Render.
+
+services:
+  # Serviço 1: O Banco de Dados PostgreSQL
+  - type: pserv # 'pserv' é o tipo para Private Service, que não é exposto publicamente.
+    name: db # O nome interno do nosso banco de dados.
+    image:
+      url: postgres:15 # Usa a imagem oficial do PostgreSQL.
+    disk:
+      name: pgdata # O nome do disco persistente.
+      mountPath: /var/lib/postgresql/data # Onde o disco será montado.
+      sizeGB: 1 # O tamanho do disco em GB.
+    envVars:
+      - key: POSTGRES_USER
+        value: evolution_user
+      - key: POSTGRES_PASSWORD
+        generateValue: true # O Render irá gerar uma senha segura automaticamente.
+      - key: POSTGRES_DB
+        value: evolution_db
+
+  # Serviço 2: A API da Evolution
+  - type: web # 'web' é um serviço exposto publicamente com um URL.
+    name: evolution-api # O nome do nosso serviço web.
+    env: docker # Diz ao Render para usar a imagem Docker especificada.
+    image:
+      url: atendai/evolution-api:latest # A imagem da Evolution API.
+    dependsOn:
+      - db # Garante que o banco de dados inicie antes da API.
+    envVars:
+      - key: AUTHENTICATION_API_KEY
+        value: "suasenhasecreta123" # Troque se quiser, ou use um segredo.
+      - key: TYPEORM_CONNECTION
+        value: postgres
+      # O Render injeta automaticamente as variáveis de conexão do banco de dados.
+      # Usamos fromService para nos referirmos ao serviço 'db' que criamos acima.
+      - key: TYPEORM_HOST
+        fromService:
+          type: pserv
+          name: db
+          property: host
+      - key: TYPEORM_PORT
+        fromService:
+          type: pserv
+          name: db
+          property: port
+      - key: TYPEORM_USERNAME
+        fromService:
+          type: pserv
+          name: db
+          property: username
+      - key: TYPEORM_PASSWORD
+        fromService:
+          type: pserv
+          name: db
+          property: password
+      - key: TYPEORM_DATABASE
+        fromService:
+          type: pserv
+          name: db
+          property: database
+      - key: TYPEORM_SYNCHRONIZE
+        value: true
+      - key: TYPEORM_LOGGING
+        value: true
+      - key: TYPEORM_DRIVER_EXTRA
+        value: '{"ssl": true}' # Habilita SSL para a conexão com o banco do Render.
+    healthCheckPath: / # O Render vai verificar este caminho para saber se a API está saudável.
+    disk:
+      name: evolution-instances
+      mountPath: /evolution/instances
+      sizeGB: 1
